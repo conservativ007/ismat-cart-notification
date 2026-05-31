@@ -11,36 +11,11 @@
       return;
     }
 
-    // console.log(cartNotificationData);
-
     let notificationShown = false;
-
-    async function test42() {
-      // use WooCommerce Store API (REST API v3)
-      return new Promise((resolve, reject) => {
-        $.ajax({
-          url: "/wp-json/wc/store/v1/cart",
-          type: "GET",
-          dataType: "json",
-          success: function (response) {
-            if (response && response.items_count > 0) {
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          },
-          error: function (xhr, status, error) {
-            console.error("Cart notification API error:", status, error);
-            // console.log("XHR:", xhr);
-            reject(error);
-          },
-        });
-      });
-    }
 
     async function checkCart() {
       try {
-        const isHasGoodsInCart = await test42();
+        const isHasGoodsInCart = await window.checkCart42();
         console.log("Has goods:", isHasGoodsInCart);
         if (isHasGoodsInCart === true) {
           showCartNotification();

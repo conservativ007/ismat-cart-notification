@@ -33,16 +33,15 @@ class Cart_Notification
   // Подключение скриптов
   public function enqueue_scripts()
   {
-    // if (!class_exists('WooCommerce') || !function_exists('WC') || !WC()->cart) {
-    //   return;
-    // }
+    if (!class_exists('WooCommerce') || !function_exists('WC') || !WC()->cart) {
+      return;
+    }
 
     wp_enqueue_script(
       'cart-utils-js',
       plugin_dir_url(__FILE__) . 'assets/js/cart-utils.js',
-      array('jquery'),
-      '1.0.1',
-      true
+      array(),
+      '1.0.1'
     );
 
     wp_enqueue_script(
@@ -62,9 +61,6 @@ class Cart_Notification
     );
 
     $data = array(
-      // 'ajaxUrl' => admin_url('admin-ajax.php'),
-      // 'hasItems' => WC()->cart->get_cart_contents_count() > 0,
-      // 'cartCount' => WC()->cart->get_cart_contents_count(),
       'cartUrl' => wc_get_cart_url(),
       'telegramUrl' => $this->get_cart_share_link(),
       'intervalHours' => 2,
