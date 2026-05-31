@@ -33,31 +33,69 @@ class Cart_Notification
   // Подключение скриптов
   public function enqueue_scripts()
   {
-    // Проверяем, что WooCommerce активен
-    // if (!class_exists('WooCommerce')) {
-    //     return;
+    // if (!class_exists('WooCommerce') || !function_exists('WC') || !WC()->cart) {
+    //   return;
     // }
 
-    // Подключаем JS файл
     wp_enqueue_script(
-      'cart-notification-js',
-      plugin_dir_url(__FILE__) . 'assets/js/cart-notification.js',
+      'cart-utils-js',
+      plugin_dir_url(__FILE__) . 'assets/js/cart-utils.js',
       array('jquery'),
-      '1.0.5',
+      '1.0.1',
       true
     );
 
-    // Передаем данные в JS
-    wp_localize_script('cart-notification-js', 'cartNotificationData', array(
-      'hasItems' => WC()->cart->get_cart_contents_count() > 0,
-      'cartCount' => WC()->cart->get_cart_contents_count(),
+    wp_enqueue_script(
+      'cart-notification-js',
+      plugin_dir_url(__FILE__) . 'assets/js/cart-notification.js',
+      array('jquery', 'cart-utils-js'),
+      '1.0.6',
+      true
+    );
+
+    wp_enqueue_script(
+      'cart-price-check-js',
+      plugin_dir_url(__FILE__) . 'assets/js/cart-price-check.js',
+      array('jquery', 'cart-utils-js'),
+      '1.0.1',
+      true
+    );
+
+    $data = array(
+      // 'ajaxUrl' => admin_url('admin-ajax.php'),
+      // 'hasItems' => WC()->cart->get_cart_contents_count() > 0,
+      // 'cartCount' => WC()->cart->get_cart_contents_count(),
       'cartUrl' => wc_get_cart_url(),
-      'intervalHours' => get_option('cart_notification_interval', 2),
-      'notificationText' => get_option('cart_notification_text', 'У вас есть товары в корзине'),
+      'telegramUrl' => $this->get_cart_share_link(),
+      'intervalHours' => 2,
+      'priceCheckInterval' => 3,
+      'notificationText' => 'У вас есть товары в корзине',
       'enabled' => get_option('cart_notification_enabled', '1')
-    ));
+    );
+
+    wp_localize_script('cart-notification-js', 'cartNotificationData', $data);
+    wp_localize_script('cart-price-check-js', 'cartNotificationData', $data);
+  }
+
+  private function get_cart_share_link()
+  {
+    if (!class_exists('WooCommerce')) {
+      return '';
+    }
+
+    $cart = WC()->cart->get_cart();
+    $products = [];
+
+    foreach ($cart as $item) {
+      $product = $item['data'];
+      $products[] = $product->get_name();
+    }
+
+    $message = 'Здравствуйте, я нашел у вас эти товары дешевле: ' . implode(', ', $products);
+
+    return 'https://t.me/IsmatDecor_official?text=' . urlencode($message);
   }
 }
 
-// Запуск плагина
+// start the plugin
 Cart_Notification::get_instance();

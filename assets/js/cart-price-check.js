@@ -2,21 +2,16 @@
   "use strict";
 
   $(document).ready(function () {
-    // console.log(CartUtils);
-
     // Проверяем, что данные переданы из PHP
     if (typeof cartNotificationData === "undefined") {
-      return;
-    }
-
-    // Проверяем, включен ли функционал
-    if (cartNotificationData.enabled !== "1") {
       return;
     }
 
     if (window.location.pathname.includes("/cart")) {
       return;
     }
+
+    // console.log(cartNotificationData);
 
     let notificationShown = false;
 
@@ -28,9 +23,7 @@
           type: "GET",
           dataType: "json",
           success: function (response) {
-            // console.log(response);
             if (response && response.items_count > 0) {
-              // console.log(response);
               resolve(true);
             } else {
               resolve(false);
@@ -64,8 +57,10 @@
         return;
       }
 
-      const lastShown = localStorage.getItem("cart_notification_last_shown");
-      const intervalHours = parseFloat(cartNotificationData.intervalHours);
+      const lastShown = localStorage.getItem(
+        "cart_price_check_notification_last_shown",
+      );
+      const intervalHours = parseFloat(cartNotificationData.priceCheckInterval);
       const intervalMs = intervalHours * 60 * 60 * 1000; // конвертируем часы в миллисекунды
       const now = Date.now();
 
@@ -85,7 +80,9 @@
       }
 
       // НОВАЯ ПРОВЕРКА: время с момента добавления товара в корзину
-      const cartCreatedTime = localStorage.getItem("cart_created_time");
+      const cartCreatedTime = localStorage.getItem(
+        "cart_price_check_created_time",
+      );
       if (cartCreatedTime) {
         const timeFromCreation = now - parseInt(cartCreatedTime);
 
@@ -105,10 +102,10 @@
       // Создаем HTML для кнопки
       const buttonHtml =
         '<a href="' +
-        cartNotificationData.cartUrl +
-        '" style="color: #fff; text-decoration: underline; font-weight: bold; margin-top: 8px; display: inline-block;">Перейти в корзину</a>';
+        cartNotificationData.telegramUrl +
+        '" style="color: #fff; text-decoration: underline; font-weight: bold; margin-top: 8px; display: inline-block;">Напишите НАМ!</a>';
 
-      const text = `<p style="margin-right: 20px;">${notificationText}</p>`;
+      const text = `<p style="margin-right: 20px;">Нашли дешевле ?</p>`;
       // Показываем уведомление через Toastify
       Toastify({
         text: text + buttonHtml,
@@ -122,33 +119,30 @@
           padding: "12px 20px",
         },
         escapeMarkup: false, // Разрешаем HTML
-        onClick: function () {
-          // При клике на уведомление - переход в корзину
-          window.location.href = cartNotificationData.cartUrl;
-        },
       }).showToast();
 
       // Сохраняем timestamp показа
-      localStorage.setItem("cart_notification_last_shown", now.toString());
+      localStorage.setItem(
+        "cart_price_check_notification_last_shown",
+        now.toString(),
+      );
       notificationShown = true;
 
-      console.log("Cart notification: уведомление показано");
+      console.log("Cart price check notification: уведомление показано");
     }
 
-    // Отслеживаем добавление товара в корзину
     $(document.body).on("added_to_cart", function () {
       const now = Date.now();
 
-      // Если cart_created_time еще не установлен - устанавливаем
-      if (!localStorage.getItem("cart_created_time")) {
-        localStorage.setItem("cart_created_time", now.toString());
+      // ОТДЕЛЬНЫЙ КЛЮЧ для второго уведомления
+      if (!localStorage.getItem("cart_price_check_created_time")) {
+        localStorage.setItem("cart_price_check_created_time", now.toString());
         console.log(
-          "Cart notification: товар добавлен в корзину, таймер запущен",
+          "Price check notification: товар добавлен, таймер на 3 часа запущен",
         );
       }
     });
 
-    // Запускаем при загрузке страницы
     setTimeout(checkCart, 500);
   });
 })(jQuery);
