@@ -31,7 +31,8 @@ async function checkCart42() {
 
     // Check if the data exists and items_count is defined
     // console.log(data);
-    return data && data.items_count > 0;
+    // return data && data.items_count > 0;
+    return data;
   } catch (error) {
     console.error("Cart notification API error:", error);
     return false; // Or throw error depending on how you handle it

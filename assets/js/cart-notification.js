@@ -20,7 +20,9 @@
 
     async function checkCart() {
       try {
-        const isHasGoodsInCart = await window.checkCart42();
+        const data = await window.checkCart42();
+        const isHasGoodsInCart = data.items_count > 0;
+
         console.log("Has goods:", isHasGoodsInCart);
         if (isHasGoodsInCart === true) {
           showCartNotification();

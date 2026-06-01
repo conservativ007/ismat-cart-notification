@@ -15,18 +15,29 @@
 
     async function checkCart() {
       try {
-        const isHasGoodsInCart = await window.checkCart42();
-        console.log("Has goods:", isHasGoodsInCart);
+        const data = await window.checkCart42();
+        const isHasGoodsInCart = data.items_count > 0;
+        // console.log("Has goods:", isHasGoodsInCart);
+
         if (isHasGoodsInCart === true) {
-          showCartNotification();
+          let message = createMessageFromTG(data);
+          showCartNotification(message);
         }
       } catch (error) {
         console.error("Error:", error);
       }
     }
 
+    function createMessageFromTG(data) {
+      let message = "Здравствуйте, я нашел у вас эти товары дешевле: \n";
+      data.items.forEach((item, index) => {
+        message += `${item.permalink} \n`;
+      });
+      return message;
+    }
+
     // Функция показа уведомления
-    function showCartNotification() {
+    function showCartNotification(message) {
       if (notificationShown) {
         console.log("Cart notification: уже показано в этой сессии");
         return;
@@ -71,17 +82,14 @@
         }
       }
 
-      // Формируем текст уведомления
-      let notificationText = cartNotificationData.notificationText;
-
-      // Создаем HTML для кнопки
+      const linkTG = "https://t.me/IsmatDecor_official?text=";
       const buttonHtml =
         '<a href="' +
-        cartNotificationData.telegramUrl +
+        linkTG +
+        encodeURIComponent(message) +
         '" style="color: #fff; text-decoration: underline; font-weight: bold; margin-top: 8px; display: inline-block;">Напишите НАМ!</a>';
-
       const text = `<p style="margin-right: 20px;">Нашли дешевле ?</p>`;
-      // Показываем уведомление через Toastify
+
       Toastify({
         text: text + buttonHtml,
         duration: -1,
