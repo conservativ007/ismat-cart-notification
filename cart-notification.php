@@ -37,6 +37,21 @@ class Cart_Notification
       return;
     }
 
+    wp_enqueue_style(
+      'toastify-css',
+      get_stylesheet_directory_uri() . '/assets/css/toastify/toastify.css',
+      array(),
+      '1.12.0'
+    );
+
+    wp_enqueue_script(
+      'toastify-js',
+      get_stylesheet_directory_uri() . '/assets/js/toastify/toastify.js',
+      array(),
+      '1.12.0',
+      true
+    );
+
     wp_enqueue_script(
       'cart-utils-js',
       plugin_dir_url(__FILE__) . 'assets/js/cart-utils.js',
@@ -47,22 +62,21 @@ class Cart_Notification
     wp_enqueue_script(
       'cart-notification-js',
       plugin_dir_url(__FILE__) . 'assets/js/cart-notification.js',
-      array('jquery', 'cart-utils-js'),
+      array('jquery', 'cart-utils-js', 'toastify-js'),
       '1.0.6',
       true
     );
 
-    wp_enqueue_script(
-      'cart-price-check-js',
-      plugin_dir_url(__FILE__) . 'assets/js/cart-price-check.js',
-      array('jquery', 'cart-utils-js'),
-      '1.0.1',
-      true
-    );
+    // wp_enqueue_script(
+    //   'cart-price-check-js',
+    //   plugin_dir_url(__FILE__) . 'assets/js/cart-price-check.js',
+    //   array('jquery', 'cart-utils-js'),
+    //   '1.0.1',
+    //   true
+    // );
 
     $data = array(
       'cartUrl' => wc_get_cart_url(),
-      'telegramUrl' => $this->get_cart_share_link(),
       'intervalHours' => 2,
       'priceCheckInterval' => 3,
       'notificationText' => 'У вас есть товары в корзине',
@@ -70,26 +84,7 @@ class Cart_Notification
     );
 
     wp_localize_script('cart-notification-js', 'cartNotificationData', $data);
-    wp_localize_script('cart-price-check-js', 'cartNotificationData', $data);
-  }
-
-  private function get_cart_share_link()
-  {
-    if (!class_exists('WooCommerce')) {
-      return '';
-    }
-
-    $cart = WC()->cart->get_cart();
-    $products = [];
-
-    foreach ($cart as $item) {
-      $product = $item['data'];
-      $products[] = $product->get_name();
-    }
-
-    $message = 'Здравствуйте, я нашел у вас эти товары дешевле: ' . implode(', ', $products);
-
-    return 'https://t.me/IsmatDecor_official?text=' . urlencode($message);
+    // wp_localize_script('cart-price-check-js', 'cartNotificationData', $data);
   }
 }
 
