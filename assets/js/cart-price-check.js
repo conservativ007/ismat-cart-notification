@@ -97,7 +97,7 @@
         position: "right",
         close: true,
         style: {
-          background: "rgba(0, 0, 0, 0.7)",
+          background: "rgba(0, 0, 0, 0.8)",
           borderRadius: "7px",
           padding: "12px 20px",
         },
