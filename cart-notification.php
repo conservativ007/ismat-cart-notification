@@ -45,7 +45,7 @@ class Cart_Notification
       'toastify-css',
       get_stylesheet_directory_uri() . '/assets/css/toastify/toastify.css',
       array(),
-      '1.12.0'
+      filemtime(get_stylesheet_directory() . '/assets/css/toastify/toastify.css')
     );
 
     wp_enqueue_script(
@@ -81,8 +81,10 @@ class Cart_Notification
 
     $data = array(
       'cartUrl' => wc_get_cart_url(),
-      'intervalHours' => 2,
-      'priceCheckInterval' => 3,
+      'cookie' => ISMAT_CART_REMINDER_COOKIE,
+      'delayMs' => ISMAT_CART_REMINDER_DELAY * 1000,
+      'dismissCookie' => ISMAT_CART_REMINDER_DISMISS_COOKIE,
+      'dismissMs' => ISMAT_CART_REMINDER_DISMISS * 1000,
       'notificationText' => 'У вас есть товары в корзине',
       'enabled' => get_option('cart_notification_enabled', '1')
     );
