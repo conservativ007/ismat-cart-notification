@@ -37,6 +37,10 @@ class Cart_Notification
       return;
     }
 
+    if (is_cart() || is_checkout()) {
+      return;
+    }
+
     wp_enqueue_style(
       'toastify-css',
       get_stylesheet_directory_uri() . '/assets/css/toastify/toastify.css',
@@ -63,7 +67,7 @@ class Cart_Notification
       'cart-notification-js',
       plugin_dir_url(__FILE__) . 'assets/js/cart-notification.js',
       array('jquery', 'cart-utils-js', 'toastify-js'),
-      '1.0.6',
+      '1.2.2',
       true
     );
 
